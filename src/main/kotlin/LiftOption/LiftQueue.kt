@@ -1,65 +1,61 @@
 package LiftOption
 
 import LiftOption.LiftCalls.Call
+import LiftOption.LiftConsts.LiftDirection
+import LiftOption.Queue.QueueInterface
+import LiftOption.Queue.QueueListener
+import LiftOption.Queue.QueueState
 
-class LiftQueue(val direction : LiftDirection) : QueueInterface {
+class LiftQueue(val direction : LiftDirection,
+                val state: QueueListener) : QueueInterface {
+
 
     private val queue : MutableSet<Call> = mutableSetOf()
     private var most : Call? = null
 
+    override fun work() {
+
+        // New Thread with checking state each time
+
+
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun addToQueue(call: Call) {
 
-        println("adding to queue " + call.from)
+        println("adding to queue " + call.floor)
 
-        if(queue.none { it.from == call.from }) {
+        if(queue.none { it.floor == call.floor }) {
             makeMost(call)
             queue.add(call)
         }
     }
 
-    private fun makeMost(call: Call) {
-        if (most == null) {
-            most = call
+    override fun removeFromQueue(floor: Int) {
+        println("removing to queue " + floor)
 
-            println("most is " + most!!.from)
-            return
+        queue.removeIf{
+            it.floor == floor
         }
-
-        when(direction){
-            LiftDirection.DOWN -> {
-                if (most!!.from > call.from)
-                    most = call
-            }
-            LiftDirection.UP -> {
-                if (most!!.from < call.from)
-                    most = call
-            }
-        }
-
-        println("most is " + most!!.from)
-
     }
-
-    override fun removeFromQueue(call: Call) {
-        queue.remove(call)
-    }
-
 
     /**
      * Лифт всегда двигается к самому дальнему этажу - most
      * Но по пути останавливается на всех нужных
      */
-    override fun getNext(current: Call): Call {
+    override fun getNext(currentFloor: Int): Call {
+
+        checkTheEnd(currentFloor)
 
         var distance : Int
         var retCall : Call? = null
 
         distance = when(direction){
             LiftDirection.DOWN -> {
-                current.from - most!!.from
+                currentFloor - most!!.floor
             }
             LiftDirection.UP -> {
-                most!!.from - current.from
+                most!!.floor - currentFloor
             }
         }
 
@@ -71,14 +67,14 @@ class LiftQueue(val direction : LiftDirection) : QueueInterface {
                      * Если q стоит на пути и он меньше дистанции,
                      * его и вернём
                      */
-                    val range = q.from - most!!.from
+                    val range = q.floor - most!!.floor
                     if (range < distance){
                         retCall = q
                         distance = range
                     }
                 }
                 LiftDirection.UP ->{
-                    val range = most!!.from - q.from
+                    val range = most!!.floor - q.floor
                     if (range < distance){
                         retCall = q
                         distance = range
@@ -87,12 +83,46 @@ class LiftQueue(val direction : LiftDirection) : QueueInterface {
             }
         }
 
-        return if(retCall == null) most!! else {
-            removeFromQueue(retCall!!)
+        removeFromQueue(currentFloor)
+        println("next is " + currentFloor)
+
+        return if(retCall == null)
+            most!!
+        else
             retCall!!
-        }
+
     }
 
     override fun getSize(): Int = queue.size
+
+
+    private fun checkTheEnd(currentFloor: Int) {
+        if (currentFloor == most!!.floor) {
+            state.changeState(direction, QueueState.State.STOPPED)
+        }
+    }
+
+    private fun makeMost(call: Call) {
+        if (most == null) {
+            most = call
+
+            println("most is " + most!!.floor)
+            return
+        }
+
+        when(direction){
+            LiftDirection.DOWN -> {
+                if (most!!.floor > call.floor)
+                    most = call
+            }
+            LiftDirection.UP -> {
+                if (most!!.floor < call.floor)
+                    most = call
+            }
+        }
+
+        println("most is " + most!!.floor)
+
+    }
 
 }

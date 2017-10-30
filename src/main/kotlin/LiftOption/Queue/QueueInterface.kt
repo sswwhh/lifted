@@ -1,4 +1,4 @@
-package LiftOption
+package LiftOption.Queue
 
 import LiftOption.LiftCalls.Call
 
@@ -6,9 +6,10 @@ import LiftOption.LiftCalls.Call
 interface QueueInterface {
 
     fun addToQueue(call: Call)
-    fun removeFromQueue(call: Call)
+    fun removeFromQueue(floor: Int)
 
-    fun getNext(current: Call): Call
+    fun getNext(current: Int): Call
+    fun work()
 
     fun getSize() : Int
 }

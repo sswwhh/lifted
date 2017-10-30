@@ -1,5 +1,5 @@
 package LiftOption.LiftCalls
 
-import LiftOption.LiftDirection
+import LiftOption.LiftConsts.LiftDirection
 
-class OutsideCall(override val from: Int, override val direction: LiftDirection) : Call
+class OutsideCall(override val floor: Int, override val direction: LiftDirection) : Call

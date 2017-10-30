@@ -7,4 +7,8 @@ object LiftConsts {
         val MEDIUM = 2
         val HIGH = 3
     }
+
+    enum class LiftDirection {
+        UP, DOWN
+    }
 }

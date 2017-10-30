@@ -1,8 +1,8 @@
 package LiftOption.LiftCalls
 
-import LiftOption.LiftDirection
+import LiftOption.LiftConsts.LiftDirection
 
 interface Call {
-    val from: Int
+    val floor: Int
     val direction: LiftDirection
 }

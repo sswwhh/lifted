@@ -1,14 +1,17 @@
 package LiftOption
 
 import LiftOption.LiftCalls.OutsideCall
+import LiftOption.LiftConsts.LiftDirection
+import LiftOption.Queue.QueueListener
+import LiftOption.Queue.QueueState
 
 /**
  * Лифт
  */
-class Lift(val params : LiftConstructor) {
+class Lift(val params : LiftConstructor) : QueueListener {
 
-    val upQueue : LiftQueue = LiftQueue(LiftDirection.UP)
-    val downQueue : LiftQueue = LiftQueue(LiftDirection.DOWN)
+    val upQueue : LiftQueue = LiftQueue(LiftDirection.UP, this)
+    val downQueue : LiftQueue = LiftQueue(LiftDirection.DOWN, this)
     var direction : LiftDirection? = null
 
 
@@ -37,16 +40,69 @@ class Lift(val params : LiftConstructor) {
         println(downQueue.getSize())
 
 
+        downQueue.getNext(4)
+        downQueue.getNext(5)
+        downQueue.getNext(10)
+
+        println(downQueue.getSize())
+
+        downQueue.getNext(1)
+        downQueue.getNext(12)
+        downQueue.getNext(20)
+
+        println(downQueue.getSize())
 
     }
 
-    /**
-     * Пока едем, можем переоптимизировать очередь
-     */
+    fun callLift(floor : Int, direction: LiftDirection){
+        when(direction){
+            LiftDirection.DOWN -> {
+                downQueue.addToQueue(OutsideCall(floor, direction))
+            }
+            LiftDirection.UP -> {
+                upQueue.addToQueue(OutsideCall(floor, direction))
+            }
+        }
+    }
+
+    fun driveLift(floor: Int){
+
+    }
+
     private fun moving(){
-
+        while (true){
+            return
+        }
     }
 
+    override fun changeState(direction: LiftDirection, state : QueueState.State) {
+        when(state){
+            QueueState.State.STOPPED -> {
+                // Достигнут максимальный элемент в очереди -
+                // запустим другую очередь
+                startQueue(otherwiseDirection(direction))
+            }
+        }
+    }
+
+    private fun otherwiseDirection(direction: LiftDirection) : LiftDirection{
+        return if (direction == LiftDirection.DOWN)
+                LiftDirection.UP
+            else LiftDirection.DOWN
+    }
+
+    private fun startQueue(direction: LiftDirection){
+        when(direction){
+            LiftDirection.DOWN -> {
+                if (downQueue.getSize() > 0)
+                    downQueue.work()
+            }
+            LiftDirection.UP -> {
+                if (upQueue.getSize() > 0)
+                    upQueue.work()
+            }
+        }
+    }
 
     override fun toString(): String =
         "\nЛифт создан с параметрами: " +
