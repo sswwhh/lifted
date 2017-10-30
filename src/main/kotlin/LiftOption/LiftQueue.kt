@@ -9,7 +9,6 @@ import LiftOption.Queue.QueueState
 class LiftQueue(val direction : LiftDirection,
                 val state: QueueListener) : QueueInterface {
 
-
     private val queue : MutableSet<Call> = mutableSetOf()
     private var most : Call? = null
 
@@ -38,6 +37,18 @@ class LiftQueue(val direction : LiftDirection,
             it.floor == floor
         }
     }
+
+    override fun removeFromQueue(floors: List<Int>) {
+        floors.forEach { f ->
+            queue.removeIf{ q->
+                q.floor == f
+            }
+        }
+    }
+
+    override fun getAllFloors(): List<Int> =
+        queue.map { it.floor }
+
 
     /**
      * Лифт всегда двигается к самому дальнему этажу - most

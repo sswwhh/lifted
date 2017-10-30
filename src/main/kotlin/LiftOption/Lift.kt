@@ -1,5 +1,6 @@
 package LiftOption
 
+import LiftOption.LiftCalls.InsideCall
 import LiftOption.LiftCalls.OutsideCall
 import LiftOption.LiftConsts.LiftDirection
 import LiftOption.Queue.QueueListener
@@ -12,7 +13,6 @@ class Lift(val params : LiftConstructor) : QueueListener {
 
     val upQueue : LiftQueue = LiftQueue(LiftDirection.UP, this)
     val downQueue : LiftQueue = LiftQueue(LiftDirection.DOWN, this)
-    var direction : LiftDirection? = null
 
 
     init {
@@ -55,53 +55,51 @@ class Lift(val params : LiftConstructor) : QueueListener {
     }
 
     fun callLift(floor : Int, direction: LiftDirection){
-        when(direction){
-            LiftDirection.DOWN -> {
-                downQueue.addToQueue(OutsideCall(floor, direction))
-            }
-            LiftDirection.UP -> {
-                upQueue.addToQueue(OutsideCall(floor, direction))
-            }
-        }
+
+        getQueue(direction).addToQueue(OutsideCall(floor, direction))
     }
 
     fun driveLift(floor: Int){
 
+        downQueue.addToQueue(InsideCall(floor, LiftDirection.DOWN))
+        upQueue.addToQueue(InsideCall(floor, LiftDirection.UP))
     }
 
-    private fun moving(){
-        while (true){
-            return
-        }
-    }
 
     override fun changeState(direction: LiftDirection, state : QueueState.State) {
         when(state){
             QueueState.State.STOPPED -> {
                 // Достигнут максимальный элемент в очереди -
                 // запустим другую очередь
-                startQueue(otherwiseDirection(direction))
+                val q = getQueue(changeDirection(direction))
+                startQueue(q)
+
+                // те этажи, что мы пройдём в другой очереди,
+                // необходимо удалить в этой
+                q.removeFromQueue(getQueue(direction).getAllFloors())
             }
         }
     }
 
-    private fun otherwiseDirection(direction: LiftDirection) : LiftDirection{
+    private fun changeDirection(direction: LiftDirection) : LiftDirection{
         return if (direction == LiftDirection.DOWN)
                 LiftDirection.UP
             else LiftDirection.DOWN
     }
 
-    private fun startQueue(direction: LiftDirection){
-        when(direction){
-            LiftDirection.DOWN -> {
-                if (downQueue.getSize() > 0)
-                    downQueue.work()
+    private fun getQueue(direction: LiftDirection) =
+            when(direction){
+                LiftDirection.DOWN -> {
+                    downQueue
+                }
+                LiftDirection.UP -> {
+                    upQueue
+                }
             }
-            LiftDirection.UP -> {
-                if (upQueue.getSize() > 0)
-                    upQueue.work()
-            }
-        }
+
+    private fun startQueue(queue: LiftQueue){
+        if (queue.getSize() > 0)
+            queue.work()
     }
 
     override fun toString(): String =
