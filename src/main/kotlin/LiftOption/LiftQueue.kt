@@ -2,7 +2,7 @@ package LiftOption
 
 import LiftOption.LiftCalls.Call
 
-class LiftQueueInterface : QueueInterface {
+class LiftQueue(val direction : LiftDirection) : QueueInterface {
 
     private val queue : MutableSet<Call> = mutableSetOf()
     private var most : Call? = null
@@ -11,11 +11,13 @@ class LiftQueueInterface : QueueInterface {
 
         println("adding to queue " + call.from)
 
-        compareMost(call)
-        queue.add(call)
+        if(queue.none { it.from == call.from }) {
+            makeMost(call)
+            queue.add(call)
+        }
     }
 
-    private fun compareMost(call: Call) {
+    private fun makeMost(call: Call) {
         if (most == null) {
             most = call
 
@@ -23,7 +25,7 @@ class LiftQueueInterface : QueueInterface {
             return
         }
 
-        when(call.direction){
+        when(direction){
             LiftDirection.DOWN -> {
                 if (most!!.from > call.from)
                     most = call
@@ -52,7 +54,7 @@ class LiftQueueInterface : QueueInterface {
         var distance : Int
         var retCall : Call? = null
 
-        distance = when(current.direction){
+        distance = when(direction){
             LiftDirection.DOWN -> {
                 current.from - most!!.from
             }
@@ -62,7 +64,7 @@ class LiftQueueInterface : QueueInterface {
         }
 
         queue.forEach { q ->
-            when(current.direction){
+            when(direction){
                 LiftDirection.DOWN -> {
 
                     /**

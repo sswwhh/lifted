@@ -7,8 +7,8 @@ import LiftOption.LiftCalls.OutsideCall
  */
 class Lift(val params : LiftConstructor) {
 
-    val upQueue : LiftQueueInterface = LiftQueueInterface()
-    val downQueue : LiftQueueInterface = LiftQueueInterface()
+    val upQueue : LiftQueue = LiftQueue(LiftDirection.UP)
+    val downQueue : LiftQueue = LiftQueue(LiftDirection.DOWN)
     var direction : LiftDirection? = null
 
 
@@ -21,6 +21,23 @@ class Lift(val params : LiftConstructor) {
         downQueue.addToQueue(OutsideCall(12, LiftDirection.DOWN))
         downQueue.addToQueue(OutsideCall(14, LiftDirection.DOWN))
         downQueue.addToQueue(OutsideCall(20, LiftDirection.DOWN))
+
+        println(downQueue.getSize())
+
+        downQueue.addToQueue(OutsideCall(12, LiftDirection.DOWN))
+        downQueue.addToQueue(OutsideCall(14, LiftDirection.DOWN))
+        downQueue.addToQueue(OutsideCall(20, LiftDirection.DOWN))
+
+        println(downQueue.getSize())
+
+        downQueue.addToQueue(OutsideCall(11, LiftDirection.DOWN))
+        downQueue.addToQueue(OutsideCall(13, LiftDirection.DOWN))
+        downQueue.addToQueue(OutsideCall(19, LiftDirection.DOWN))
+
+        println(downQueue.getSize())
+
+
+
     }
 
     /**
