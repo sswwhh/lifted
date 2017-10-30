@@ -1,16 +1,16 @@
-package lifted.kotlin
+package LiftOption
 
-import lifted.kotlin.Const.FLOOR_HEIGHT_MAX_M
-import lifted.kotlin.Const.FLOOR_HEIGHT_MIN_CM
-import lifted.kotlin.Const.FLOOR_HEIGHT_MIN_M
-import lifted.kotlin.Const.FLOOR_NUMBER_MAX
-import lifted.kotlin.Const.FLOOR_NUMBER_MIN
-import lifted.kotlin.Const.OPENCLOSETIME_MAX
-import lifted.kotlin.Const.OPENCLOSETIME_MIN
-import lifted.kotlin.Const.SPEED_MAX
-import lifted.kotlin.Const.SPEED_MIN
-import lifted.kotlin.Const.Code
-import lifted.kotlin.exceptions.LiftConstructorInitException
+import Const.FLOOR_HEIGHT_MAX_M
+import Const.FLOOR_HEIGHT_MIN_CM
+import Const.FLOOR_HEIGHT_MIN_M
+import Const.FLOOR_NUMBER_MAX
+import Const.FLOOR_NUMBER_MIN
+import Const.OPENCLOSETIME_MAX
+import Const.OPENCLOSETIME_MIN
+import Const.SPEED_MAX
+import Const.SPEED_MIN
+import Const.Code
+import LiftOption.exceptions.LiftConstructorInitException
 
 /**
  * Основные параметры лифта

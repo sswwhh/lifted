@@ -1,7 +1,7 @@
-package lifted.kotlin.exceptions
+package LiftOption.exceptions
 
-import lifted.kotlin.Const.Code
-import lifted.kotlin.Const.Error
+import Const.Code
+import Const.Error
 
 
 class LiftConstructorInitException(type : Code) : ExceptionInInitializerError(){
