@@ -3,9 +3,10 @@ package LiftOption
 import LiftOption.LiftCalls.Call
 import LiftOption.LiftConsts.LiftDirection
 import LiftOption.Queue.QueueInterface
-import LiftOption.Queue.QueueLeftListener
+import LiftOption.Queue.QueueListener
 
-class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftListener) : QueueInterface {
+
+class LiftQueue(val direction : LiftDirection, val floorListener: QueueListener) : QueueInterface {
 
     private val queue : MutableSet<Call> = mutableSetOf()
     private var finalPoint: Call? = null
@@ -16,6 +17,8 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
                 makeFinalPoint(call)
                 queue.add(call)
             }
+
+            floorListener.workerGo(direction)
         }
     }
 
@@ -25,8 +28,17 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
                 it.floor == floor
             }
         }
+        floorListener.floorLeft(floor, direction)
+    }
 
-        floorLeftListener.floorLeft(floor, direction)
+    override fun removeFromQueue(floor: Int, dir: LiftDirection) {
+        if (direction != dir) {
+            synchronized(this) {
+                queue.removeIf {
+                    it.floor == floor
+                }
+            }
+        }
     }
 
     override fun removeFromQueue(floors: List<Int>) {
@@ -46,20 +58,27 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
     /**
      * Лифт всегда двигается к самому дальнему этажу - finalPoint
      * Но по пути останавливается на всех нужных
+     *
+     * @param currentFloor - текущий этаж
+     * @return [Call] - следующий этаж, на который нужно ехать, или null
      */
     override fun getNext(currentFloor: Int): Call? {
 
-        if(isFinal(currentFloor)) return null
+        if(isFinal(currentFloor)){
+            removeFromQueue(currentFloor)
+            recountFinalPoint()
+            return null
+        }
 
         var distance : Int
         var retCall : Call? = null
 
         distance = when(direction){
-            LiftDirection.DOWN -> {
-                currentFloor - finalPoint!!.floor
-            }
             LiftDirection.UP -> {
                 finalPoint!!.floor - currentFloor
+            }
+            LiftDirection.DOWN -> {
+                currentFloor - finalPoint!!.floor
             }
         }
 
@@ -69,15 +88,15 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
              * его и вернём
              */
             when(direction){
-                LiftDirection.DOWN -> {
-                    val range = q.floor - finalPoint!!.floor
+                LiftDirection.UP ->{
+                    val range = q.floor - currentFloor
                     if (range < distance){
                         retCall = q
                         distance = range
                     }
                 }
-                LiftDirection.UP ->{
-                    val range = finalPoint!!.floor - q.floor
+                LiftDirection.DOWN -> {
+                    val range = currentFloor - q.floor//q.floor - finalPoint!!.floor
                     if (range < distance){
                         retCall = q
                         distance = range
@@ -88,10 +107,8 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
 
         removeFromQueue(currentFloor)
 
-        println("next is " + currentFloor)
-
         return if(retCall == null)
-            finalPoint!!
+            finalPoint!! // эта строка должна быть @Deprecated, но надо проверить
         else
             retCall!!
 
@@ -100,12 +117,9 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
     override fun getSize(): Int = queue.size
 
 
-    private fun isFinal(currentFloor: Int) : Boolean {
-        if (currentFloor == finalPoint!!.floor) {
-            return true
-        }
-        return false
-    }
+    private fun isFinal(currentFloor: Int) : Boolean =
+            currentFloor == finalPoint!!.floor
+
 
     private fun makeFinalPoint(call: Call) {
         if (finalPoint == null) {
@@ -128,6 +142,17 @@ class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftL
 
         println("finalPoint is " + finalPoint!!.floor)
 
+    }
+
+    private fun recountFinalPoint(){
+        when(direction){
+            LiftDirection.DOWN -> {
+                finalPoint = queue.minBy { it.floor }
+            }
+            LiftDirection.UP -> {
+                finalPoint = queue.maxBy { it.floor }
+            }
+        }
     }
 
 }

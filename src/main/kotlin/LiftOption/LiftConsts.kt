@@ -2,7 +2,7 @@ package LiftOption
 
 object LiftConsts {
 
-    object LiftParams{
+    object LiftParams {
         val FLOOR_NUMBER_MIN = 5
         val FLOOR_NUMBER_MAX = 20
 
@@ -17,16 +17,21 @@ object LiftConsts {
 
         val OPENCLOSETIME_MIN = 15
         val OPENCLOSETIME_MAX = 120
+
+        val START_FLOOR = 1
     }
-    enum class Code{
+
+    enum class Code {
         FLOOR_NUMBER, FLOOR_HEIGHT, SPEED, OPENCLOSETIME
     }
 
-    object Error{
+    object Error {
         val FLOOR_NUMBER_ERROR = "Количество этажей должно быть от 5 до 20"
         val FLOOR_HEIGHT_ERROR = "Высота этажа должна быть от 2.2м до 10м"
         val SPEED_ERROR = "Скорость лифта должна варьироваться от 1 до 4 м\\с"
         val OPENCLOSETIME_ERROR = "Время между открытием и закрытием двери варьируется от 15с до 120с"
+
+        val INTERRUPTED = "Вы прервали работу лифта, и он застрял"
     }
 
 
@@ -34,7 +39,18 @@ object LiftConsts {
         UP, DOWN
     }
 
-    object Texts{
+    fun swapDirection(direction : LiftDirection) : LiftDirection{
+        when(direction){
+            LiftDirection.UP ->{
+                return LiftDirection.DOWN
+            }
+            LiftDirection.DOWN -> {
+                return LiftDirection.DOWN
+            }
+        }
+    }
+
+    object Texts {
         val HELLO_STRING = "Необходимо ввести: \n" +
                 "(1) количество этажей (от 5 до 20), \n" +
                 "(2) высоту одного этажа (от 2.2 до 10 м), \n" +

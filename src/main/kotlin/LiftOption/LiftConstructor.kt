@@ -9,13 +9,13 @@ import LiftOption.exceptions.LiftConstructorInitException
  */
 class LiftConstructor : Throwable {
 
-    internal var floorNumber: Int
+    private var floorNumber: Int
     internal var floorHeight: Float
     internal var speed: Float
-    internal var openclosetime: Int
+    internal var openclosetime: Long
 
     constructor(floorNumber: Int, floorHeight: Float,
-                speed: Float, opencloseTime: Int){
+                speed: Float, opencloseTime: Long){
 
         this.floorNumber = floorNumber
         this.floorHeight = floorHeight

@@ -12,6 +12,7 @@ fun main(args : Array<String>){
 
     if (theLift != null){
         // start lift in another thread
+        theLift.start()
 
         // Вечно слушаем команды от пользователя
         while(true){
@@ -65,5 +66,5 @@ private fun checkLift(args: Array<String>) : Lift? {
 }
 
 fun argsToLiftConstructor(args: Array<String>) : LiftConstructor =
-        LiftConstructor(args[0].toInt(), args[1].toFloat(), args[2].toFloat(), args[3].toInt())
+        LiftConstructor(args[0].toInt(), args[1].toFloat(), args[2].toFloat(), args[3].toLong())
 
