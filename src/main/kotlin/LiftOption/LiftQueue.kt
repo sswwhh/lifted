@@ -28,17 +28,6 @@ class LiftQueue(val direction : LiftDirection, val floorListener: QueueListener)
                 it.floor == floor
             }
         }
-        floorListener.floorLeft(floor, direction)
-    }
-
-    override fun removeFromQueue(floor: Int, dir: LiftDirection) {
-        if (direction != dir) {
-            synchronized(this) {
-                queue.removeIf {
-                    it.floor == floor
-                }
-            }
-        }
     }
 
     override fun removeFromQueue(floors: List<Int>) {

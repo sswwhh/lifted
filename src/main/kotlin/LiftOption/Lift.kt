@@ -82,11 +82,6 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
             }
         }
 
-    override fun floorLeft(floor: Int, baseDirection: LiftDirection) {
-        val direction = swapLiftDirection(baseDirection)
-        getQueue(direction).removeFromQueue(floor, direction)
-    }
-
     override fun workerGo(direction: LiftDirection) {
         synchronized(this){
             directionQueue = direction
@@ -174,7 +169,7 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
      */
     private fun openCloseDoors() {
         printOpenedDoors(currentFloor)
-        sleep(waitDoorsTime / 5)
+        sleep(waitDoorsTime)
         printClosedDoors(currentFloor)
     }
 

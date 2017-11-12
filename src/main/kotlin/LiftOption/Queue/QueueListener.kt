@@ -8,6 +8,5 @@ import LiftOption.LiftConsts
  * - когда чего-то добавили, нужно стартовать воркер, если он еще не стартовал
  */
 interface QueueListener {
-    fun floorLeft(floor : Int, baseDirection : LiftConsts.LiftDirection)
     fun workerGo(direction : LiftConsts.LiftDirection)
 }
