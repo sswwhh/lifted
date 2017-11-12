@@ -3,45 +3,38 @@ package LiftOption
 import LiftOption.LiftCalls.Call
 import LiftOption.LiftConsts.LiftDirection
 import LiftOption.Queue.QueueInterface
-import LiftOption.Queue.QueueListener
-import LiftOption.Queue.QueueState
+import LiftOption.Queue.QueueLeftListener
 
-class LiftQueue(val direction : LiftDirection,
-                val state: QueueListener) : QueueInterface {
+class LiftQueue(val direction : LiftDirection, val floorLeftListener: QueueLeftListener) : QueueInterface {
 
     private val queue : MutableSet<Call> = mutableSetOf()
-    private var most : Call? = null
-
-    override fun work() {
-
-        // New Thread with checking state each time
-
-
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    private var finalPoint: Call? = null
 
     override fun addToQueue(call: Call) {
-
-        println("adding to queue " + call.floor)
-
         if(queue.none { it.floor == call.floor }) {
-            makeMost(call)
-            queue.add(call)
+            synchronized(this) {
+                makeFinalPoint(call)
+                queue.add(call)
+            }
         }
     }
 
     override fun removeFromQueue(floor: Int) {
-        println("removing to queue " + floor)
-
-        queue.removeIf{
-            it.floor == floor
+        synchronized(this){
+            queue.removeIf{
+                it.floor == floor
+            }
         }
+
+        floorLeftListener.floorLeft(floor, direction)
     }
 
     override fun removeFromQueue(floors: List<Int>) {
         floors.forEach { f ->
-            queue.removeIf{ q->
-                q.floor == f
+            synchronized(this) {
+                queue.removeIf { q ->
+                    q.floor == f
+                }
             }
         }
     }
@@ -51,41 +44,40 @@ class LiftQueue(val direction : LiftDirection,
 
 
     /**
-     * Лифт всегда двигается к самому дальнему этажу - most
+     * Лифт всегда двигается к самому дальнему этажу - finalPoint
      * Но по пути останавливается на всех нужных
      */
-    override fun getNext(currentFloor: Int): Call {
+    override fun getNext(currentFloor: Int): Call? {
 
-        checkTheEnd(currentFloor)
+        if(isFinal(currentFloor)) return null
 
         var distance : Int
         var retCall : Call? = null
 
         distance = when(direction){
             LiftDirection.DOWN -> {
-                currentFloor - most!!.floor
+                currentFloor - finalPoint!!.floor
             }
             LiftDirection.UP -> {
-                most!!.floor - currentFloor
+                finalPoint!!.floor - currentFloor
             }
         }
 
         queue.forEach { q ->
+            /**
+             * Если q стоит на пути и он меньше дистанции,
+             * его и вернём
+             */
             when(direction){
                 LiftDirection.DOWN -> {
-
-                    /**
-                     * Если q стоит на пути и он меньше дистанции,
-                     * его и вернём
-                     */
-                    val range = q.floor - most!!.floor
+                    val range = q.floor - finalPoint!!.floor
                     if (range < distance){
                         retCall = q
                         distance = range
                     }
                 }
                 LiftDirection.UP ->{
-                    val range = most!!.floor - q.floor
+                    val range = finalPoint!!.floor - q.floor
                     if (range < distance){
                         retCall = q
                         distance = range
@@ -95,10 +87,11 @@ class LiftQueue(val direction : LiftDirection,
         }
 
         removeFromQueue(currentFloor)
+
         println("next is " + currentFloor)
 
         return if(retCall == null)
-            most!!
+            finalPoint!!
         else
             retCall!!
 
@@ -107,32 +100,33 @@ class LiftQueue(val direction : LiftDirection,
     override fun getSize(): Int = queue.size
 
 
-    private fun checkTheEnd(currentFloor: Int) {
-        if (currentFloor == most!!.floor) {
-            state.changeState(direction, QueueState.State.STOPPED)
+    private fun isFinal(currentFloor: Int) : Boolean {
+        if (currentFloor == finalPoint!!.floor) {
+            return true
         }
+        return false
     }
 
-    private fun makeMost(call: Call) {
-        if (most == null) {
-            most = call
+    private fun makeFinalPoint(call: Call) {
+        if (finalPoint == null) {
+            finalPoint = call
 
-            println("most is " + most!!.floor)
+            println("finalPoint is " + finalPoint!!.floor)
             return
         }
 
         when(direction){
             LiftDirection.DOWN -> {
-                if (most!!.floor > call.floor)
-                    most = call
+                if (finalPoint!!.floor > call.floor)
+                    finalPoint = call
             }
             LiftDirection.UP -> {
-                if (most!!.floor < call.floor)
-                    most = call
+                if (finalPoint!!.floor < call.floor)
+                    finalPoint = call
             }
         }
 
-        println("most is " + most!!.floor)
+        println("finalPoint is " + finalPoint!!.floor)
 
     }
 

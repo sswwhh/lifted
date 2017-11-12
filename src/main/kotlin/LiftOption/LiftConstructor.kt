@@ -1,15 +1,7 @@
 package LiftOption
 
-import Const.FLOOR_HEIGHT_MAX_M
-import Const.FLOOR_HEIGHT_MIN_CM
-import Const.FLOOR_HEIGHT_MIN_M
-import Const.FLOOR_NUMBER_MAX
-import Const.FLOOR_NUMBER_MIN
-import Const.OPENCLOSETIME_MAX
-import Const.OPENCLOSETIME_MIN
-import Const.SPEED_MAX
-import Const.SPEED_MIN
-import Const.Code
+import LiftOption.LiftConsts.Code
+import LiftOption.LiftConsts.LiftParams
 import LiftOption.exceptions.LiftConstructorInitException
 
 /**
@@ -30,24 +22,24 @@ class LiftConstructor : Throwable {
         this.speed = speed
         this.openclosetime = opencloseTime
 
-        if (floorNumber < FLOOR_NUMBER_MIN ||
-            floorNumber > FLOOR_NUMBER_MAX)
+        if (floorNumber < LiftParams.FLOOR_NUMBER_MIN ||
+            floorNumber > LiftParams.FLOOR_NUMBER_MAX)
             throw LiftConstructorInitException(Code.FLOOR_NUMBER)
 
         // Перевести высоту этажа в метры
-        if (floorHeight > FLOOR_HEIGHT_MIN_CM)
+        if (floorHeight > LiftParams.FLOOR_HEIGHT_MIN_CM)
             this.floorHeight /= 100
         else
-            if (floorHeight < FLOOR_HEIGHT_MIN_M ||
-                floorHeight > FLOOR_HEIGHT_MAX_M)
+            if (floorHeight < LiftParams.FLOOR_HEIGHT_MIN_M ||
+                floorHeight > LiftParams.FLOOR_HEIGHT_MAX_M)
                 throw LiftConstructorInitException(Code.FLOOR_HEIGHT)
 
-        if (speed <= SPEED_MIN ||
-            speed > SPEED_MAX)
+        if (speed <= LiftParams.SPEED_MIN ||
+            speed > LiftParams.SPEED_MAX)
             throw LiftConstructorInitException(Code.SPEED)
 
-        if (opencloseTime <= OPENCLOSETIME_MIN ||
-            opencloseTime > OPENCLOSETIME_MAX)
+        if (opencloseTime <= LiftParams.OPENCLOSETIME_MIN ||
+            opencloseTime > LiftParams.OPENCLOSETIME_MAX)
             throw LiftConstructorInitException(Code.OPENCLOSETIME)
 
     }

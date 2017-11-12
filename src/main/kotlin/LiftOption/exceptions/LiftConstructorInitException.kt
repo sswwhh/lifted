@@ -1,7 +1,7 @@
 package LiftOption.exceptions
 
-import Const.Code
-import Const.Error
+import LiftOption.LiftConsts.Code
+import LiftOption.LiftConsts.Error
 
 
 class LiftConstructorInitException(type : Code) : ExceptionInInitializerError(){
