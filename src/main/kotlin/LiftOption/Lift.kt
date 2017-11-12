@@ -33,6 +33,11 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
      */
     fun callLift(floor : Int, direction: LiftDirection){
 
+        if(!checkInput(floor)){
+            println(LiftConsts.Error.NO_FLOOR)
+            return
+        }
+
         when(direction){
             LiftDirection.UP -> {
                 // чтобы лифт приехал,
@@ -59,6 +64,11 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
      */
     fun driveLift(floor: Int){
 
+        if(!checkInput(floor)){
+            println(LiftConsts.Error.NO_FLOOR)
+            return
+        }
+
         if (currentFloor > floor){
             downQueue.addToQueue(InsideCall(floor, LiftDirection.DOWN))
         } else {
@@ -66,6 +76,9 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
         }
 
     }
+
+    private fun checkInput(floor: Int): Boolean =
+            (floor > 0 && floor <= params.floorNumber)
 
     private fun swapLiftDirection(direction: LiftDirection) : LiftDirection =
         if (direction == LiftDirection.DOWN)

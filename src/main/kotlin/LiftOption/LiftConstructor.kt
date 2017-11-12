@@ -9,7 +9,7 @@ import LiftOption.exceptions.LiftConstructorInitException
  */
 class LiftConstructor : Throwable {
 
-    private var floorNumber: Int
+    internal var floorNumber: Int
     internal var floorHeight: Float
     internal var speed: Float
     internal var openclosetime: Long
@@ -34,11 +34,11 @@ class LiftConstructor : Throwable {
                 floorHeight > LiftParams.FLOOR_HEIGHT_MAX_M)
                 throw LiftConstructorInitException(Code.FLOOR_HEIGHT)
 
-        if (speed <= LiftParams.SPEED_MIN ||
+        if (speed < LiftParams.SPEED_MIN ||
             speed > LiftParams.SPEED_MAX)
             throw LiftConstructorInitException(Code.SPEED)
 
-        if (opencloseTime <= LiftParams.OPENCLOSETIME_MIN ||
+        if (opencloseTime < LiftParams.OPENCLOSETIME_MIN ||
             opencloseTime > LiftParams.OPENCLOSETIME_MAX)
             throw LiftConstructorInitException(Code.OPENCLOSETIME)
 
