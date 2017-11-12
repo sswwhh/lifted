@@ -28,15 +28,43 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
         println(this)
     }
 
+    /**
+     * Вызов лифта снаружи
+     */
     fun callLift(floor : Int, direction: LiftDirection){
+
+        when(direction){
+            LiftDirection.UP -> {
+                // чтобы лифт приехал,
+                // даже если мы вызываем его с нижнего этажа наверх,
+                // когда он находится выше
+                if (floor < currentFloor){
+                    getQueue(swapLiftDirection(direction)).addToQueue(OutsideCall(floor, swapLiftDirection(direction)))
+                    return
+                }
+            }
+            LiftDirection.DOWN -> {
+                if (floor > currentFloor){
+                    getQueue(swapLiftDirection(direction)).addToQueue(OutsideCall(floor, swapLiftDirection(direction)))
+                    return
+                }
+            }
+        }
 
         getQueue(direction).addToQueue(OutsideCall(floor, direction))
     }
 
+    /**
+     * Нажать на кнопку внутри лифта
+     */
     fun driveLift(floor: Int){
 
-        downQueue.addToQueue(InsideCall(floor, LiftDirection.DOWN))
-        upQueue.addToQueue(InsideCall(floor, LiftDirection.UP))
+        if (currentFloor > floor){
+            downQueue.addToQueue(InsideCall(floor, LiftDirection.DOWN))
+        } else {
+            upQueue.addToQueue(InsideCall(floor, LiftDirection.UP))
+        }
+
     }
 
     private fun swapLiftDirection(direction: LiftDirection) : LiftDirection =
@@ -95,7 +123,7 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
                 return
             }
 
-            }
+        }
     }
 
     private fun crossQueue(queue: LiftQueue) {
@@ -114,7 +142,6 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
                 }
             } else {
                 // - Да
-                // мы на нужном этаже
 
                 arrived()
                 return
@@ -127,8 +154,10 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
         openCloseDoors()
     }
 
+    /**
+     * Проехали этаж
+     */
     private fun goneFloor(direction: LiftDirection) {
-        // Проехали этаж
         sleep(oneFloorTime)
         when(direction){
             LiftDirection.UP -> {
@@ -140,8 +169,10 @@ class Lift(private val params : LiftConstructor) : Thread(), QueueListener {
         }
     }
 
+    /**
+     * Открыли дверь
+     */
     private fun openCloseDoors() {
-        // Открыли дверь
         printOpenedDoors(currentFloor)
         sleep(waitDoorsTime / 5)
         printClosedDoors(currentFloor)
