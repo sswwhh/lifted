@@ -40,11 +40,6 @@ fun main(args : Array<String>){
         println(HELLO_STRING)
     }
 
-
-
-
-    checkLift(args)
-
 }
 
 private fun checkLift(args: Array<String>) : Lift? {
